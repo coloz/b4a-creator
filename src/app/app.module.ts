@@ -17,13 +17,14 @@ import {
   SaveOutline, FolderOpenOutline, MonitorOutline, SettingOutline,
   RightOutline, RightCircleOutline, LoadingOutline, CloudOutline,
   SearchOutline, EnterOutline, AppstoreAddOutline, CloudDownloadOutline,
-  LeftCircleOutline
+  LeftCircleOutline, GlobalOutline, GithubOutline, DeleteOutline
 } from '@ant-design/icons-angular/icons';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 
 const icons: IconDefinition[] = [CheckOutline, DownloadOutline, CodeOutline, FileAddOutline,
   SaveOutline, FolderOpenOutline, MonitorOutline, SettingOutline, RightOutline, RightCircleOutline,
   LoadingOutline, CloudOutline, SearchOutline, EnterOutline, AppstoreAddOutline, CloudDownloadOutline,
-  LeftCircleOutline
+  LeftCircleOutline, GlobalOutline, GithubOutline, DeleteOutline
 ];
 
 registerLocaleData(en);
@@ -38,7 +39,8 @@ registerLocaleData(en);
     FormsModule,
     HttpClientModule,
     BrowserAnimationsModule,
-    CreatorModule
+    CreatorModule,
+    NzIconModule.forRoot(icons)
   ],
   providers: [{ provide: NZ_I18N, useValue: en_US }],
   bootstrap: [AppComponent]
