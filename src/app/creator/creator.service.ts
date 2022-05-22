@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
+import { BlockJson } from './interface';
 
 @Injectable({
     providedIn: 'root'
@@ -12,7 +13,7 @@ export class CreatorService {
 
     }
 
-    changeColor(blockJson){
+    changeColor(blockJson) {
         // blockJson['colour']
     }
 
@@ -32,7 +33,7 @@ export class CreatorService {
                 }
                 let item = {
                     "type": "input_value",
-                    "name": paramName.replace(/\s/g,'')
+                    "name": paramName.replace(/\s/g, '')
                 }
                 args.push(item)
                 // blockJson['message0'] += ` %${index + 1}`
@@ -41,9 +42,11 @@ export class CreatorService {
         return args
     }
 
-    code2blockJson(code: string) {
-        let blockJson = {
-            "inputsInline": true
+    code2blockJson(code: string): BlockJson {
+        let blockJson: BlockJson = {
+            "inputsInline": true,
+            "message0": '',
+            "type": ''
         }
         // get funcName \ type
         let p1 = code.indexOf('=');
@@ -54,10 +57,14 @@ export class CreatorService {
         blockJson['type'] = type
         let args = this.getParams(code)
         blockJson['args0'] = args
-        // blockJson['message0'] =
+        if (typeof blockJson['b4a'] == 'undefined') blockJson['b4a'] = {}
+        blockJson['b4a']['code'] = `${funcName}(`
         args.forEach((arg, index) => {
             blockJson['message0'] += ` %${index + 1}`
+            blockJson['b4a'].code += `\$\{${arg.name}\}`
+            if (index != 0 && index != args.length - 1) blockJson['b4a'].code += ', '
         })
+        blockJson['b4a']['code'] += `);`
         // 获取返回值
         if (code.includes('=')) {
             blockJson['output'] = 'Any'
@@ -66,6 +73,32 @@ export class CreatorService {
             blockJson["nextStatement"] = null
         }
         return blockJson
+    }
+
+    // updateMessage(){
+
+    // }
+
+    getObjectName(code: string) {
+        let objectName
+        let result = code.match(/\s(\S*?)(\s|;|=|\()/)
+        if (result != null) {
+            objectName = result[0].replace(/\s/g, '').replace('=', '').replace(';', '').replace('(', '')
+            console.log('objectName:', objectName);
+            return objectName
+        }
+        return null
+    }
+
+    getClassName(code: string) {
+        let className
+        let result = code.match(/(\S*?)\s/)
+        if (result != null) {
+            className = result[0].replace(/\s/g, '').replace('=', '').replace(';', '').replace('(', '')
+            console.log('className:', className);
+            return className
+        }
+        return null
     }
 
 }

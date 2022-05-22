@@ -4,6 +4,7 @@ import { CreatorService } from './creator.service';
 import Sortable from 'sortablejs';
 import { saveAs } from 'file-saver';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { BlockJson } from './interface';
 
 @Component({
   selector: 'app-creator',
@@ -17,7 +18,7 @@ export class CreatorComponent implements OnInit {
     this.isFold = !this.isFold
   }
 
-  mode = 'new'  //新建：new   编辑：edit
+  mode = 'new'  //新建:new 编辑:edit
 
   @ViewChild('blockPreviewList', { read: ElementRef, static: false }) blockPreviewList: ElementRef;
 
@@ -38,7 +39,11 @@ export class CreatorComponent implements OnInit {
 
   code = ''
 
-  blockJson = {};
+  blockJson: BlockJson = {
+    "inputsInline": true,
+    "message0": '',
+    "type": ''
+  };
   blockJsonString = '';
 
   color = '#666'
@@ -99,14 +104,30 @@ export class CreatorComponent implements OnInit {
 
     this.blockJson['colour'] = this.color
     this.blockJson['toolbox'] = this.toolbox
-    if (typeof this.blockJson['b4a'] == 'undefined')
-      this.blockJson['b4a'] = {}
+
     if (this.sourceCode.macro != '')
       this.blockJson['b4a']['macro'] = this.sourceCode.macro
     if (this.sourceCode.library != '')
       this.blockJson['b4a']['library'] = this.sourceCode.library
-    if (this.sourceCode.object != '')
-      this.blockJson['b4a']['object'] = this.sourceCode.object
+    if (this.sourceCode.object != '') {
+      let objectName = this.creatorService.getObjectName(this.sourceCode.object)
+      let className = this.creatorService.getClassName(this.sourceCode.object)
+      if (objectName != null) {
+        if (this.sourceCode.code.split('.')[0].includes(objectName))
+          this.blockJson['args0'].unshift({
+            "type": "field_variable",
+            "name": "OBJECT",
+            "variable": objectName,
+            "variableTypes": [
+              className
+            ],
+            "defaultType": className
+          })
+        this.blockJson['message0'] += ` %${this.blockJson['args0'].length}`
+      }
+      this.blockJson['b4a']['object'] = this.sourceCode.object.replace(objectName, '${OBJECT}')
+    }
+
     if (this.sourceCode.function != '')
       this.blockJson['b4a']['function'] = this.sourceCode.function
     if (this.sourceCode.setup != '')
@@ -180,6 +201,7 @@ export class CreatorComponent implements OnInit {
   selectBlock(block) {
     this.mode = 'edit';
     this.selectedBlock = block
+    this.toolbox = this.selectedBlock['toolbox']
     this.blockJsonString = JSON.stringify(this.selectedBlock)
   }
 
@@ -203,6 +225,7 @@ export class CreatorComponent implements OnInit {
 
   newBlock() {
     this.mode = 'new'
+    this.blockJsonString = '';
     this.sourceCode = {
       type: 'A',
       macro: '',
@@ -213,12 +236,21 @@ export class CreatorComponent implements OnInit {
       setup: '',
       code: ''
     }
-    this.blockJsonString = '';
-    this.blockJson = {};
+    this.blockJson = {
+      "inputsInline": true,
+      "message0": '',
+      "type": ''
+    };
   }
 
   addBlock() {
     this.blockList.push(this.blockJson)
+    this.saveBlockList()
+  }
+
+  saveBlock() {
+    if (this.mode == 'new')
+      this.blockList.push(this.blockJson)
     this.saveBlockList()
   }
 
@@ -244,12 +276,13 @@ export class CreatorComponent implements OnInit {
     }
   }
 
-  clean() {
+  cleanAll() {
     this.modal.confirm({
       nzTitle: '清空',
       nzContent: '您确定要删除所有的块吗？',
       nzOnOk: () => {
         this.blockList = []
+        this.newBlock();
         this.saveBlockList()
       }
     })

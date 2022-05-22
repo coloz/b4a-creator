@@ -144,7 +144,7 @@ header {
             padding: 0 15px 15px 15px;
             position: relative;
             width: 50%;
-            height: 400px;
+            height: 350px;
 
             >div:first-child {
                 height: 30px;
@@ -155,7 +155,7 @@ header {
             app-block-preview {
                 ::ng-deep {
                     .blockPreview {
-                        height: 300px;
+                        height: 260px;
                         width: 100%;
                     }
                 }
@@ -175,7 +175,7 @@ header {
 
     .bottom-box {
         width: 100%;
-        height: calc(100% - 415px);
+        height: calc(100% - 365px);
         display: flex;
         position: relative;
 

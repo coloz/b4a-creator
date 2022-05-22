@@ -75,7 +75,7 @@ export class BlockPreviewComponent implements OnInit {
       Blockly.serialization.blocks.append(json, this.workspace)
       this.centerBlock()
     } catch (error) {
-
+      console.log(error);
     }
 
   }
