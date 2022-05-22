@@ -1,0 +1,183 @@
+<header>
+    <div>
+        <button nz-button nzSize="large" (click)="openFile()" nz-tooltip nzTooltipTitle="打开"
+            nzTooltipPlacement="bottom">
+            <i nz-icon nzType="folder-open" nzTheme="outline"></i>
+        </button>
+        <button nz-button nzSize="large" (click)="download()" nz-tooltip nzTooltipTitle="导出"
+            nzTooltipPlacement="bottom">
+            <i nz-icon nzType="cloud-download" nzTheme="outline"></i>
+        </button>
+        <nz-divider nzType="vertical"></nz-divider>
+        <button nz-button nzSize="large" (click)="newBlock()" nz-tooltip nzTooltipTitle="新建块"
+            nzTooltipPlacement="bottom">
+            <i nz-icon nzType="appstore-add" nzTheme="outline"></i>
+        </button>
+        <button nz-button nzSize="large" (click)="clean()" nz-tooltip nzTooltipTitle="导出"
+            nzTooltipPlacement="bottom">
+            <i nz-icon nzType="delete" nzTheme="outline"></i>
+        </button>
+        <nz-divider nzType="vertical"></nz-divider>
+        <button nz-button nzSize="large" (click)="gotoGithub()" nz-tooltip nzTooltipTitle="Github"
+            nzTooltipPlacement="bottom">
+            <i nz-icon nzType="github" nzTheme="outline"></i>
+        </button>
+        <button nz-button nzSize="large" (click)="gotoWebsite()" nz-tooltip nzTooltipTitle="官网"
+            nzTooltipPlacement="bottom">
+            <i nz-icon nzType="global" nzTheme="outline"></i>
+        </button>
+    </div>
+</header>
+<div class="creator-box">
+    <div class="blockPreview-box animate__animated animate__fadeInLeft animate__faster"
+        [ngStyle]="{'width': isFold?'0':'350px'}">
+        <div class="title">块列表
+            <!-- <i nz-icon nzType="left-circle" nzTheme="outline" (click)="fold()"></i> -->
+        </div>
+        <div class="blockPreviewList" #blockPreviewList>
+            <div class="item" *ngFor="let block of blockList;index as i" (click)="selectBlock(block)">
+                <app-block-preview [json]="block"></app-block-preview>
+                <div class="name">{{block.type}} <i (click)="delBlock(block)" nz-icon nzType="close"
+                        nzTheme="outline"></i></div>
+                <div class="mask"></div>
+            </div>
+        </div>
+    </div>
+    <div class="right-box animate__animated animate__fadeInRight animate__faster"
+        [ngStyle]="{'width': isFold?'100%':'calc(100% - 350px)'}">
+        <div class="top-box">
+            <div class="preview-box">
+                <div class="title">块预览</div>
+                <app-block-preview [json]="blockJson"></app-block-preview>
+                <div class="save-btn">
+                    <button nz-button nzType="primary" nzShape="round" (click)="addBlock()">保存块</button>
+                </div>
+            </div>
+            <div class="itemList">
+                <div class="title">常用配置修改</div>
+                <div class="item">
+                    <div class="name">颜色</div>
+                    <div>
+                        <ngx-colors ngx-colors-trigger [ngModel]="color" (change)="colorChange($event)"></ngx-colors>
+                    </div>
+                </div>
+                <div class="item b-line">
+                    <div class="name">参数</div>
+                    <div class="type">类型</div>
+                    <div class="value">默认值</div>
+                </div>
+                <div class="item" *ngFor="let item of blockJson['args0'];index as i">
+                    <div class="name">参数 {{item.name}}</div>
+                    <div class="type">
+                        <nz-select [(ngModel)]="item.type" (ngModelChange)="argTypeChange(item,i)">
+                            <nz-option nzValue="field_number" nzLabel="数值"></nz-option>
+                            <nz-option nzValue="field_input" nzLabel="字符串"></nz-option>
+                            <nz-option nzValue="field_variable" nzLabel="变量/对象"></nz-option>
+                            <nz-option nzValue="field_dropdown" nzLabel="下拉框"></nz-option>
+                            <nz-option nzValue="input_value" nzLabel="输入框"></nz-option>
+                        </nz-select>
+                    </div>
+                    <div class="value">
+                        <input *ngIf="item.type=='field_input'" nz-input [(ngModel)]="item.text" />
+                        <input *ngIf="item.type=='field_number'" nz-input [(ngModel)]="item.value" />
+                        <nz-select *ngIf="item.type=='field_dropdown'" [(ngModel)]="item.options"
+                            (ngModelChange)="argTypeChange(item,i)">
+                            <nz-option nzValue="${board.digitalPins}" nzLabel="数字引脚"></nz-option>
+                            <nz-option nzValue="${board.analogPins}" nzLabel="模拟输入引脚"></nz-option>
+                            <nz-option nzValue="${board.pwmPins}" nzLabel="PWM引脚"></nz-option>
+                            <nz-option nzValue="${board.serialPort}" nzLabel="串口"></nz-option>
+                            <nz-option nzValue="${board.serialSpeed}" nzLabel="串口波特率"></nz-option>
+                            <nz-option nzValue="${board.interrupt}" nzLabel="中断"></nz-option>
+                            <nz-option nzValue="${board.spi}" nzLabel="SPI"></nz-option>
+                            <nz-option nzValue="${board.i2c}" nzLabel="I2C"></nz-option>
+                        </nz-select>
+                    </div>
+                </div>
+                <div class="item b-line" style="margin-bottom:5px;"></div>
+                <!-- <div style="border-top: 1px solid #ccc;margin-bottom: 5px;"></div> -->
+                <div class="item">
+                    <div class="name">边栏显示</div>
+                    <div class="type">
+                        <label nz-checkbox [(ngModel)]="toolbox.show" (ngModelChange)="toolboxChange()">显示</label>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="name">边栏分类</div>
+                    <div class="type">
+                        <input nz-input [(ngModel)]="toolbox.category" (ngModelChange)="toolboxChange()" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-box">
+            <div class="source-box" *ngIf="mode=='new'">
+                <!-- <div class="item" style="height: 70px;flex-grow: 0;">
+                    <div class="title">块类型</div>
+                    <nz-radio-group [(ngModel)]="sourceCode.type" nzButtonStyle="solid">
+                        <label nz-radio-button nzValue="A">类函数</label>
+                        <label nz-radio-button nzValue="B">普通函数</label>
+                        <label nz-radio-button nzValue="C">特定代码</label>
+                    </nz-radio-group>
+                </div> -->
+                <div class="item">
+                    <div class="title">宏定义</div>
+                    <div>
+                        <ngx-monaco-editor [options]="{language:'c++',theme:'vs-dark',lineNumbers:'on'}"
+                            [(ngModel)]="sourceCode.macro" (ngModelChange)="updateBlockJson()">
+                        </ngx-monaco-editor>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="title">库引入</div>
+                    <div>
+                        <ngx-monaco-editor [options]="{language:'c++',theme:'vs-dark',lineNumbers:'on'}"
+                            [(ngModel)]="sourceCode.library" (ngModelChange)="updateBlockJson()">
+                        </ngx-monaco-editor>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="title">实例化</div>
+                    <div>
+                        <ngx-monaco-editor [options]="{language:'c++',theme:'vs-dark',lineNumbers:'on'}"
+                            [(ngModel)]="sourceCode.object" (ngModelChange)="updateBlockJson()">
+                        </ngx-monaco-editor>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="title">函数定义</div>
+                    <div>
+                        <ngx-monaco-editor [options]="{language:'c++',theme:'vs-dark',lineNumbers:'on'}"
+                            [(ngModel)]="sourceCode.function" (ngModelChange)="updateBlockJson()">
+                        </ngx-monaco-editor>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="title">初始化</div>
+                    <div>
+                        <ngx-monaco-editor [options]="{language:'c++',theme:'vs-dark',lineNumbers:'on'}"
+                            [(ngModel)]="sourceCode.setup" (ngModelChange)="updateBlockJson()">
+                        </ngx-monaco-editor>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="title">目标代码<span>*</span></div>
+                    <div>
+                        <ngx-monaco-editor [options]="{language:'c++',theme:'vs-dark',lineNumbers:'on'}"
+                            [(ngModel)]="sourceCode.code" (ngModelChange)="updateBlockJson()">
+                        </ngx-monaco-editor>
+                    </div>
+                </div>
+            </div>
+            <div class="json-box" [ngClass]="{'edit': mode=='edit'}">
+                <div class="title">B4A配置</div>
+                <div style="height: calc(100% - 30px);">
+                    <ngx-monaco-editor [options]="{language:'json',theme:'vs-dark',lineNumbers:'on'}"
+                        [ngModel]="blockJsonString" (ngModelChange)="blockJsonChange($event)"
+                        (init)="blockJsonEditorInit($event)">
+                    </ngx-monaco-editor>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

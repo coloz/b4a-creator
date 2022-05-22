@@ -28,10 +28,27 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "./node_modules/@ant-design/icons-angular/src/inline-svg/",
+                "output": "/assets/"
+              },
+              {
+                "glob": "**/*",
+                "input": "./node_modules/blockly/media",
+                "output": "./media/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/monaco-editor/min/",
+                "output": "assets/monaco-editor/min"
+              }
             ],
             "styles": [
-              "src/styles.scss"
+              "./node_modules/ng-zorro-antd/ng-zorro-antd.min.css",
+              "src/styles.scss",
+              "node_modules/animate.css/animate.min.css"
             ],
             "scripts": []
           },
@@ -99,6 +116,7 @@
               "src/assets"
             ],
             "styles": [
+              "./node_modules/ng-zorro-antd/ng-zorro-antd.min.css",
               "src/styles.scss"
             ],
             "scripts": []

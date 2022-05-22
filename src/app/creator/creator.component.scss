@@ -1,0 +1,274 @@
+header {
+    width: 100%;
+    height: 55px;
+    background-color: #008184;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+
+    button {
+        margin-right: 10px;
+        background-color: #48c2c4;
+        color: #008184;
+        border: none;
+
+        &:hover {
+            background-color: #05b0b3;
+            color: #ffffff;
+        }
+    }
+
+    nz-select {
+        margin-right: 20px;
+    }
+
+    nz-divider {
+        margin-right: 20px;
+    }
+
+    >div {
+        display: flex;
+        align-items: center;
+    }
+
+}
+
+.creator-box {
+    display: flex;
+    height: calc(100% - 55px);
+}
+
+.title {
+    height: 30px;
+    display: flex;
+    align-items: center;
+    font-weight: 700;
+
+    i {
+        position: absolute;
+        right: 15px;
+        font-size: 20px;
+        color: #ccc;
+        cursor: pointer;
+    }
+}
+
+.blockPreview-box {
+    width: 350px;
+    height: calc(100% - 30px);
+    padding: 0 15px 0 15px;
+    margin-top: 15px;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 0 0 10px #CCC;
+    position: relative;
+
+    .blockPreviewList {
+        overflow-y: auto;
+        height: calc(100% - 50px);
+    }
+
+    .item {
+        width: 100%;
+        position: relative;
+        margin-bottom: 10px;
+        cursor: pointer;
+
+        &:hover {
+            i {
+                visibility: visible !important;
+            }
+        }
+
+        app-block-preview {
+            ::ng-deep {
+                .blockPreview {
+                    height: 60px;
+                    width: 100%;
+                }
+
+                .blocklyMainBackground {
+                    stroke: none;
+                }
+            }
+        }
+
+
+        .name {
+            height: calc(100% - 56px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            i {
+                width: 30px;
+                height: 30px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-top: 3px;
+                color: rgb(70, 70, 70);
+                visibility: hidden;
+
+                &:hover {
+                    color: rgb(162, 20, 20);
+                }
+            }
+        }
+
+        .mask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+        }
+    }
+}
+
+.right-box {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    width: calc(100% - 350px);
+    position: relative;
+    padding: 15px;
+
+    .top-box {
+        display: flex;
+        border-radius: 8px;
+        box-shadow: 0 0 10px #CCC;
+
+        .preview-box {
+            padding: 0 15px 15px 15px;
+            position: relative;
+            width: 50%;
+            height: 400px;
+
+            >div:first-child {
+                height: 30px;
+                display: flex;
+                align-items: center;
+            }
+
+            app-block-preview {
+                ::ng-deep {
+                    .blockPreview {
+                        height: 300px;
+                        width: 100%;
+                    }
+                }
+            }
+
+            .save-btn {
+                position: absolute;
+                bottom: 15px;
+                width: 100%;
+                display: flex;
+                justify-content: center;
+            }
+        }
+    }
+
+
+
+    .bottom-box {
+        width: 100%;
+        height: calc(100% - 415px);
+        display: flex;
+        position: relative;
+
+        >div {
+            width: 50%;
+            height: 100%;
+        }
+    }
+
+    .source-box {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 0 15px 15px 15px;
+        margin-top: 15px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px #CCC;
+
+        &.edit {
+            width: 0 !important;
+        }
+
+        .item {
+            flex-grow: 1;
+            position: relative;
+
+            >div:first-child {
+                height: 30px;
+                display: flex;
+                align-items: center;
+
+                span {
+                    margin-left: 5px;
+                    color: rgb(181, 38, 38);
+                }
+            }
+
+            >div:last-child {
+                height: calc(100% - 30px);
+                position: relative;
+            }
+        }
+    }
+
+    .json-box {
+        border-radius: 8px;
+        box-shadow: 0 0 10px #CCC;
+        margin: 15px 0 0 15px;
+        padding: 0 15px 15px 15px;
+        position: relative;
+
+        &.edit {
+            width: 100% !important;
+            margin-left: 0 !important;
+        }
+    }
+
+}
+
+.itemList {
+    .item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+
+        &.b-line {
+            border-bottom: 1px solid #CCC;
+            margin-top: 10px;
+            font-weight: 700;
+        }
+
+        .name {
+            margin-right: 15px;
+            width: 110px;
+            white-space: nowrap;
+        }
+
+        .type {
+            width: 110px;
+            margin-right: 5px;
+
+            nz-select {
+                width: 100%;
+            }
+        }
+
+        .value {
+            width: 150px;
+
+            nz-select {
+                width: 100%;
+            }
+        }
+
+    }
+}
