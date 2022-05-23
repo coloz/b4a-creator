@@ -13,10 +13,6 @@ export class CreatorService {
 
     }
 
-    changeColor(blockJson) {
-        // blockJson['colour']
-    }
-
     getParams(code) {
         let params = code.match(/\(.+\)/)
         let args = []
@@ -42,13 +38,7 @@ export class CreatorService {
         return args
     }
 
-    code2blockJson(code: string): BlockJson {
-        let blockJson: BlockJson = {
-            "inputsInline": true,
-            "message0": '',
-            "type": ''
-        }
-        // get funcName \ type
+    code2blockJson(code: string, blockJson): BlockJson {
         let p1 = code.indexOf('=');
         let p2 = code.indexOf('(');
         let funcName = code.substring(p1 + 1, p2).replace(/\s/g, '')
@@ -62,15 +52,18 @@ export class CreatorService {
         args.forEach((arg, index) => {
             blockJson['message0'] += ` %${index + 1}`
             blockJson['b4a'].code += `\$\{${arg.name}\}`
-            if (index != 0 && index != args.length - 1) blockJson['b4a'].code += ', '
+            if (index != args.length - 1) blockJson['b4a'].code += ', '
         })
         blockJson['b4a']['code'] += `);`
         // 获取返回值
         if (code.includes('=')) {
-            blockJson['output'] = 'Any'
+            blockJson['output'] = 'Any';
+            delete blockJson["previousStatement"] 
+            delete blockJson["nextStatement"]
         } else {
             blockJson["previousStatement"] = null
             blockJson["nextStatement"] = null
+            delete blockJson['output']
         }
         return blockJson
     }

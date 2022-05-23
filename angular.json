@@ -43,7 +43,8 @@
             "styles": [
               "./node_modules/ng-zorro-antd/ng-zorro-antd.min.css",
               "src/styles.scss",
-              "node_modules/animate.css/animate.min.css"
+              "node_modules/animate.css/animate.min.css",
+              "node_modules/jsoneditor/dist/jsoneditor.min.css"
             ],
             "scripts": []
           },

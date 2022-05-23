@@ -15,6 +15,7 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzMessageModule } from 'ng-zorro-antd/message';
+import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { NzMessageModule } from 'ng-zorro-antd/message';
     NzCheckboxModule,
     NzDividerModule,
     NzToolTipModule,
-    NzMessageModule
+    NzMessageModule,
+    NzInputNumberModule
   ],
   exports: [
     CreatorComponent

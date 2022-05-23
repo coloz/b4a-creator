@@ -5,6 +5,7 @@ import Sortable from 'sortablejs';
 import { saveAs } from 'file-saver';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { BlockJson } from './interface';
+import * as JSONEditor from 'jsoneditor';
 
 @Component({
   selector: 'app-creator',
@@ -21,9 +22,11 @@ export class CreatorComponent implements OnInit {
   mode = 'new'  //新建:new 编辑:edit
 
   @ViewChild('blockPreviewList', { read: ElementRef, static: false }) blockPreviewList: ElementRef;
+  @ViewChild('jsoneditor', { read: ElementRef, static: true }) jsoneditorEl: ElementRef;
+
+  jsonEditor;
 
   sourceCode = {
-    type: 'A',
     macro: '',
     library: '',
     variable: '',
@@ -42,16 +45,16 @@ export class CreatorComponent implements OnInit {
   blockJson: BlockJson = {
     "inputsInline": true,
     "message0": '',
-    "type": ''
+    "type": '',
+    "colour": '#48c2c4',
+    "args0": [],
+    "toolbox": {
+      "show": true,
+      "category": "unknown"
+    }
   };
-  blockJsonString = '';
 
-  color = '#666'
-
-  toolbox = {
-    "show": true,
-    "category": "unknown"
-  }
+  blockJson_preview;
 
   constructor(
     private creatorService: CreatorService,
@@ -62,25 +65,45 @@ export class CreatorComponent implements OnInit {
   ngOnInit(): void {
     let blockList = JSON.parse(localStorage.getItem('blockList'))
     if (blockList != null) this.blockList = blockList
-    let color = localStorage.getItem('color')
-    if (color != null) this.color = color
-    let sourceCode = JSON.parse(localStorage.getItem('sourceCode'))
-    if (sourceCode != null) this.sourceCode = sourceCode
+    // let sourceCode = JSON.parse(localStorage.getItem('sourceCode'))
+    // if (sourceCode != null) this.sourceCode = sourceCode
     let blockJson = JSON.parse(localStorage.getItem('blockJson'))
     if (blockJson != null) this.blockJson = blockJson
   }
 
   ngAfterViewInit(): void {
     let sortable = new Sortable(this.blockPreviewList.nativeElement, {
-      sort: true,  // sorting inside list
+      sort: true,
       delay: 0,
       animation: 150,
+      dataIdAttr: "id",
       onEnd: () => {
-        // console.log(this.blockList);
-        this.saveBlockList()
+        let tempBlockList = []
+        sortable.toArray().forEach(index => {
+          tempBlockList.push(this.blockList[index])
+        });
+        this.blockList = tempBlockList
+        localStorage.setItem('blockList', JSON.stringify(this.blockList))
       }
     });
+    this.initJsonEditor()
   }
+
+  initJsonEditor() {
+    this.jsonEditor = new JSONEditor(this.jsoneditorEl.nativeElement, {
+      mode: 'code',
+      mainMenuBar: false,
+      navigationBar: false,
+      statusBar: false,
+      onChange: () => {
+        this.blockJson = this.jsonEditor.get()
+        this.blockJson_preview = JSON.parse(JSON.stringify(this.blockJson))
+        localStorage.setItem('blockJson', JSON.stringify(this.blockJson))
+      }
+    })
+    this.blockJsonChange()
+  }
+
 
   blockJsonEditor
   blockJsonEditorInit(editor) {
@@ -90,110 +113,91 @@ export class CreatorComponent implements OnInit {
     }, 500);
   }
 
-  blockJsonChange(str) {
-    this.blockJsonEditor.getAction('editor.action.formatDocument').run();
-    this.blockJson = JSON.parse(str)
-    localStorage.setItem('sourceCode', JSON.stringify(this.sourceCode))
-    localStorage.setItem('blockJson', str)
-  }
-
   updateBlockJson() {
-    this.blockJson = this.creatorService.code2blockJson(this.sourceCode.code)
+    this.blockJson = this.creatorService.code2blockJson(this.sourceCode.code, this.blockJson)
 
-    if (typeof this.blockJson['type'] == 'undefined') return
+    this.blockJson['b4a']['macro'] = this.sourceCode.macro
+    this.blockJson['b4a']['library'] = this.sourceCode.library
 
-    this.blockJson['colour'] = this.color
-    this.blockJson['toolbox'] = this.toolbox
-
-    if (this.sourceCode.macro != '')
-      this.blockJson['b4a']['macro'] = this.sourceCode.macro
-    if (this.sourceCode.library != '')
-      this.blockJson['b4a']['library'] = this.sourceCode.library
-    if (this.sourceCode.object != '') {
-      let objectName = this.creatorService.getObjectName(this.sourceCode.object)
-      let className = this.creatorService.getClassName(this.sourceCode.object)
-      if (objectName != null) {
-        if (this.sourceCode.code.split('.')[0].includes(objectName))
-          this.blockJson['args0'].unshift({
-            "type": "field_variable",
-            "name": "OBJECT",
-            "variable": objectName,
-            "variableTypes": [
-              className
-            ],
-            "defaultType": className
-          })
-        this.blockJson['message0'] += ` %${this.blockJson['args0'].length}`
-      }
-      this.blockJson['b4a']['object'] = this.sourceCode.object.replace(objectName, '${OBJECT}')
+    let objectName = this.creatorService.getObjectName(this.sourceCode.object)
+    let className = this.creatorService.getClassName(this.sourceCode.object)
+    if (objectName != null) {
+      if (this.sourceCode.code.split('.')[0].includes(objectName))
+        this.blockJson['args0'].unshift({
+          "type": "field_variable",
+          "name": "OBJECT",
+          "variable": objectName,
+          "variableTypes": [
+            className
+          ],
+          "defaultType": className
+        })
+      this.blockJson['message0'] += ` %${this.blockJson['args0'].length}`
     }
 
-    if (this.sourceCode.function != '')
-      this.blockJson['b4a']['function'] = this.sourceCode.function
-    if (this.sourceCode.setup != '')
-      this.blockJson['b4a']['setup'] = this.sourceCode.setup
 
-    this.blockJsonString = JSON.stringify(this.blockJson)
-    console.log(this.blockJsonString);
+    this.blockJson['b4a']['object'] = this.sourceCode.object.replace(objectName, '${OBJECT}')
+    this.blockJson['b4a']['code'] = this.blockJson['b4a']['code'].replace(objectName, '${OBJECT}')
 
+    this.blockJson['b4a']['function'] = this.sourceCode.function
+    this.blockJson['b4a']['setup'] = this.sourceCode.setup
+
+    if (this.blockJson['b4a']['macro'] == "") delete this.blockJson['b4a']['macro']
+    if (this.blockJson['b4a']['library'] == "") delete this.blockJson['b4a']['library']
+    if (this.blockJson['b4a']['function'] == "") delete this.blockJson['b4a']['function']
+    if (this.blockJson['b4a']['object'] == "") delete this.blockJson['b4a']['object']
+    if (this.blockJson['b4a']['setup'] == "") delete this.blockJson['b4a']['setup']
+
+    this.blockJsonChange()
   }
 
-  colorChange(e) {
-    if (typeof this.blockJson['type'] == 'undefined') return
-    this.blockJson['colour'] = e
-    this.blockJsonString = JSON.stringify(this.blockJson)
-    localStorage.setItem('color', e)
+  blockJsonChange() {
+    this.jsonEditor.set(this.blockJson);
+    this.blockJson_preview = JSON.parse(JSON.stringify(this.blockJson))
+    localStorage.setItem('blockJson', JSON.stringify(this.blockJson))
   }
 
-  argTypeChange(item, i) {
-    console.log(i, item);
+  argTypeChange(item, index) {
     switch (item.type) {
       case 'field_number':
-        if (typeof item['value'] == 'undefined')
-          item = {
-            type: 'field_number',
-            name: item.name,
-            value: 0
-          }
+        item = {
+          type: 'field_number',
+          name: item.name,
+          value: 0
+        }
         break;
       case 'field_input':
-        if (typeof item['text'] == 'undefined')
-          item = {
-            type: 'field_input',
-            name: item.name,
-            text: 'text'
-          }
+        item = {
+          type: 'field_input',
+          name: item.name,
+          text: 'text'
+        }
         break;
       case 'field_variable':
-        if (typeof item['variable'] == 'undefined')
-          item = {
-            type: 'field_variable',
-            name: item.name,
-            variable: 'value'
-          }
+        item = {
+          type: 'field_variable',
+          name: item.name,
+          variable: 'value'
+        }
         break;
       case 'field_dropdown':
-        if (typeof item['options'] == 'undefined')
-          item = {
-            type: 'field_variable',
-            name: item.name,
-            options: '${board.digitalPins}'
-          }
+        item = {
+          type: 'field_dropdown',
+          name: item.name,
+          options: '${board.digitalPins}'
+        }
         break;
       case 'input_value':
-
+        item = {
+          type: 'input_value',
+          name: item.name
+        }
         break;
       default:
         break;
     }
-    this.blockJson['args0'][i] = item
-    this.blockJsonString = JSON.stringify(this.blockJson)
-  }
-
-  toolboxChange() {
-    console.log(this.toolbox);
-    this.blockJson['toolbox'] = this.toolbox
-    this.blockJsonString = JSON.stringify(this.blockJson)
+    this.blockJson['args0'][index] = item
+    this.blockJsonChange()
   }
 
   selectedBlock;
@@ -201,8 +205,9 @@ export class CreatorComponent implements OnInit {
   selectBlock(block) {
     this.mode = 'edit';
     this.selectedBlock = block
-    this.toolbox = this.selectedBlock['toolbox']
-    this.blockJsonString = JSON.stringify(this.selectedBlock)
+    this.blockJson = block
+    this.blockJsonChange()
+
   }
 
   openFile() {
@@ -225,9 +230,7 @@ export class CreatorComponent implements OnInit {
 
   newBlock() {
     this.mode = 'new'
-    this.blockJsonString = '';
     this.sourceCode = {
-      type: 'A',
       macro: '',
       library: '',
       variable: '',
@@ -236,21 +239,33 @@ export class CreatorComponent implements OnInit {
       setup: '',
       code: ''
     }
+
     this.blockJson = {
       "inputsInline": true,
       "message0": '',
-      "type": ''
-    };
+      "type": '',
+      "colour": '#48c2c4',
+      "args0": [],
+      "toolbox": {
+        "show": true,
+        "category": "unknown"
+      }
+    }
+    this.selectedBlock = null
   }
 
-  addBlock() {
-    this.blockList.push(this.blockJson)
-    this.saveBlockList()
-  }
+  // addBlock() {
+  //   this.blockList.push(JSON.parse(JSON.stringify(this.blockJson)))
+  //   this.saveBlockList()
+  // }
 
   saveBlock() {
+    if (this.blockJson.type == '') return
     if (this.mode == 'new')
-      this.blockList.push(this.blockJson)
+      this.blockList.push(JSON.parse(JSON.stringify(this.blockJson)))
+    else if (this.mode == 'edit') {
+      this.blockList[this.blockList.indexOf(this.selectedBlock)] = JSON.parse(JSON.stringify(this.blockJson))
+    }
     this.saveBlockList()
   }
 
