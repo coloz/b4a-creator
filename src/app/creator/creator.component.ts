@@ -54,7 +54,7 @@ export class CreatorComponent implements OnInit {
     }
   };
 
-  blockJson_preview;
+  blockJson_preview = JSON.parse(JSON.stringify(this.blockJson));
 
   constructor(
     private creatorService: CreatorService,
@@ -151,10 +151,28 @@ export class CreatorComponent implements OnInit {
     this.blockJsonChange()
   }
 
+  errorTip = [];
   blockJsonChange() {
-    this.jsonEditor.set(this.blockJson);
+    this.checkJson()
+    this.jsonEditor.set(this.blockJson)
     this.blockJson_preview = JSON.parse(JSON.stringify(this.blockJson))
     localStorage.setItem('blockJson', JSON.stringify(this.blockJson))
+  }
+
+  checkJson() {
+    this.errorTip = [];
+    if (this.blockJson.type == '') {
+      this.errorTip.push(`not found "type" or "type" is empty`);
+    }
+    if (this.blockJson.args0.length > 0) {
+      for (let index = 1; index <= this.blockJson.args0.length; index++) {
+        let argStr = '%' + index
+        console.log(argStr);
+        if (!this.blockJson.message0.includes(argStr)) {
+          this.errorTip.push(`not found "${argStr}" in message0`);
+        }
+      }
+    }
   }
 
   argTypeChange(item, index) {
@@ -191,6 +209,15 @@ export class CreatorComponent implements OnInit {
         item = {
           type: 'input_value',
           name: item.name
+        }
+        break;
+      case 'field_image':
+        item = {
+          "type": "field_image",
+          "src": "",
+          "width": 20,
+          "height": 20,
+          "alt": "*"
         }
         break;
       default:

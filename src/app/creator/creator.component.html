@@ -33,8 +33,8 @@
         [ngStyle]="{'width': isFold?'0':'350px'}">
         <div class="title">块列表</div>
         <div class="blockPreviewList" #blockPreviewList>
-            <div class="item" data-id="{{i}}" *ngFor="let block of blockList;index as i" [ngClass]="{'selected': selectedBlock==block}"
-                (click)="selectBlock(block)">
+            <div class="item" data-id="{{i}}" *ngFor="let block of blockList;index as i"
+                [ngClass]="{'selected': selectedBlock==block}" (click)="selectBlock(block)">
                 <app-block-preview [json]="block"></app-block-preview>
                 <div class="name">{{block.type}} <i (click)="delBlock(block)" nz-icon nzType="close"
                         nzTheme="outline"></i></div>
@@ -51,6 +51,10 @@
                 <div class="save-btn">
                     <button nz-button nzType="primary" nzShape="round" (click)="saveBlock()">保存块</button>
                 </div>
+                <div class="error">
+                    <div *ngFor="let tip of errorTip" class="animate__animated animate__fadeInRight animate__faster">
+                        {{tip}}</div>
+                </div>
             </div>
             <div class="itemList">
                 <div class="title">常用配置修改</div>
@@ -59,6 +63,12 @@
                     <div>
                         <ngx-colors ngx-colors-trigger [(ngModel)]="blockJson.colour"
                             (ngModelChange)="blockJsonChange()"></ngx-colors>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="name">文本</div>
+                    <div style="min-width: 265px;">
+                        <input nz-input [(ngModel)]="blockJson.message0" (ngModelChange)="blockJsonChange()" />
                     </div>
                 </div>
                 <ng-container *ngIf="blockJson['args0'] && blockJson['args0'].length>0">
@@ -76,6 +86,7 @@
                                 <nz-option nzValue="field_input" nzLabel="字符串"></nz-option>
                                 <nz-option nzValue="field_variable" nzLabel="变量/对象"></nz-option>
                                 <nz-option nzValue="field_dropdown" nzLabel="下拉选项"></nz-option>
+                                <nz-option nzValue="field_image" nzLabel="图片"></nz-option>
                                 <nz-option nzValue="input_value" nzLabel="块输入"></nz-option>
                             </nz-select>
                         </div>
@@ -85,6 +96,8 @@
                             <nz-input-number *ngIf="item.type=='field_number'" nz-input [(ngModel)]="item.value"
                                 type="​number​" (ngModelChange)="blockJsonChange()"></nz-input-number>
                             <input *ngIf="item.type=='field_variable'" nz-input [(ngModel)]="item.variable"
+                                (ngModelChange)="blockJsonChange()" />
+                            <input *ngIf="item.type=='field_image'" nz-input [(ngModel)]="item.src"
                                 (ngModelChange)="blockJsonChange()" />
                             <nz-select *ngIf="item.type=='field_dropdown'" [(ngModel)]="item.options"
                                 (ngModelChange)="blockJsonChange()">

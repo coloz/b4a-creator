@@ -158,6 +158,7 @@ header {
             position: relative;
             width: 50%;
             height: 350px;
+            overflow: hidden;
 
             >div:first-child {
                 height: 30px;
@@ -180,6 +181,13 @@ header {
                 width: 100%;
                 display: flex;
                 justify-content: center;
+            }
+
+            .error {
+                position: absolute;
+                bottom: 65px;
+                right: 20px;
+                color: #d30d0d;
             }
         }
     }
@@ -254,10 +262,14 @@ header {
 
 .itemList {
     margin-left: 15px;
+    width: 48%;
+    position: relative;
+
     .item {
         display: flex;
         align-items: center;
         margin-bottom: 5px;
+        width: 100%;
 
         &.b-line {
             border-bottom: 1px solid #CCC;

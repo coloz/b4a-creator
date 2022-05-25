@@ -26,7 +26,7 @@ export class BlockPreviewComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    if (typeof this.json.args1 != 'undefined') {
+    if (typeof this.json != 'undefined' && typeof this.json.args1 != 'undefined') {
       this.blockHeight = '108px'
     }
   }

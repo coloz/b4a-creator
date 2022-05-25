@@ -31,5 +31,6 @@ export interface Arg {
     "defaultType"?: string,
     "text"?: string,
     "value"?: number,
-    "options"?: any
+    "options"?: any,
+    "src"?: string
 }
