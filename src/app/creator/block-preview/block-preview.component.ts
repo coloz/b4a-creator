@@ -1,5 +1,6 @@
 import { Component, ElementRef, Input, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import Blockly from 'blockly';
+import { BlockJson } from '../interface';
 import { blockList } from './blocks';
 import { board } from './board';
 import { ToolBox } from './toolbox';
@@ -11,31 +12,40 @@ import { ToolBox } from './toolbox';
 })
 export class BlockPreviewComponent implements OnInit {
 
-  @Input() json;
+  @Input() json: BlockJson;
   @Input() readOnly = true;
 
   @ViewChild('blockPreview', { read: ElementRef, static: true }) blockPreview: ElementRef
 
 
   workspace;
+  blockHeight = '60px'
 
-  constructor() { }
+  constructor(
+
+  ) { }
 
   ngOnInit(): void {
+    if (typeof this.json.args1 != 'undefined') {
+      this.blockHeight = '108px'
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (typeof changes['json'] != 'undefined') {
-      if (!this.workspace) {
-        this.creatWorkspace()
-      }
-      if (typeof this.json != "undefined")
-        if (typeof this.json.type != "undefined" && this.json.type != "")
-          this.creatBlock(this.processJsonVariable(this.json))
-        else {
-          this.workspace.clear();
+      setTimeout(() => {
+        if (!this.workspace) {
+          this.creatWorkspace()
         }
+        if (typeof this.json != "undefined")
+          if (typeof this.json.type != "undefined" && this.json.type != "")
+            this.creatBlock(this.processJsonVariable(this.json))
+          else {
+            this.workspace.clear();
+          }
+      }, 100);
     }
+
   }
 
   creatWorkspace() {
@@ -84,6 +94,7 @@ export class BlockPreviewComponent implements OnInit {
     // Get metrics.
     let block = this.workspace.getTopBlocks()[0];
     let blockMetrics = block.getHeightWidth();
+    // this.blockHeight = blockMetrics['height']
     let blockCoordinates = block.getRelativeToSurfaceXY();
     let workspaceMetrics = this.workspace.getMetrics();
     // Calculate new coordinates.
@@ -113,6 +124,12 @@ export class BlockPreviewComponent implements OnInit {
       });
     }
     return JSON.parse(jsonString)
+  }
+
+  getHeight() {
+    let blockEl = this.blockPreview.nativeElement.querySelector(".blocklyBlockCanvas")
+    console.log(blockEl);
+
   }
 
 }

@@ -12,6 +12,7 @@ header {
         background-color: #48c2c4;
         color: #008184;
         border: none;
+        position: relative;
 
         &:hover {
             background-color: #05b0b3;
@@ -95,7 +96,7 @@ header {
 
             ::ng-deep {
                 .blockPreview {
-                    height: 60px;
+                    // height: 60px;
                     width: 100%;
                 }
 
@@ -167,7 +168,7 @@ header {
             app-block-preview {
                 ::ng-deep {
                     .blockPreview {
-                        height: 260px;
+                        height: 260px !important;
                         width: 100%;
                     }
                 }

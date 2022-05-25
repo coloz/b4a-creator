@@ -4,6 +4,7 @@ export interface BlockJson {
     "message0": string,
     "type": string,
     "args0"?: Arg[],
+    "args1"?: Arg[],
     "previousStatement"?: string,
     "nextStatement"?: string,
     "colour"?: string,
