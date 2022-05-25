@@ -223,6 +223,12 @@ export class CreatorComponent implements OnInit {
       reader.readAsText(fileContent, 'utf-8')
       reader.onload = (e) => {
         console.log(reader.result);
+        try {
+          let str = String(reader.result)
+          this.blockList = JSON.parse(str)
+        } catch (error) {
+          this.message.error('加载失败，库文件可能损坏')
+        }
       }
     }
 
@@ -253,11 +259,6 @@ export class CreatorComponent implements OnInit {
     }
     this.selectedBlock = null
   }
-
-  // addBlock() {
-  //   this.blockList.push(JSON.parse(JSON.stringify(this.blockJson)))
-  //   this.saveBlockList()
-  // }
 
   saveBlock() {
     if (this.blockJson.type == '') return
