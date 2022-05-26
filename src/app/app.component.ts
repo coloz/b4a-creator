@@ -16,10 +16,12 @@ export class AppComponent {
     private loadService: LoadService
   ) {
     this.loadService.loaded.subscribe(state => {
-      this.loaded = state
-      setTimeout(() => {
-        this.showLoading = false
-      }, 1000);
+      if (state) {
+        this.loaded = state
+        setTimeout(() => {
+          this.showLoading = false
+        }, 1000);
+      }
     })
   }
 }
