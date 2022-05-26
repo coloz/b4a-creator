@@ -39,7 +39,6 @@ registerLocaleData(en);
     FormsModule,
     HttpClientModule,
     BrowserAnimationsModule,
-    CreatorModule,
     NzIconModule.forRoot(icons)
   ],
   providers: [{ provide: NZ_I18N, useValue: en_US }],
