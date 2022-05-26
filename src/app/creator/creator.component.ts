@@ -6,6 +6,7 @@ import { saveAs } from 'file-saver';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { BlockJson } from './interface';
 import * as JSONEditor from 'jsoneditor';
+import { LoadService } from '../load.service';
 
 @Component({
   selector: 'app-creator',
@@ -45,7 +46,7 @@ export class CreatorComponent implements OnInit {
   blockJson: BlockJson = {
     "inputsInline": true,
     "message0": '',
-    "type": '',
+    "type": 'new_block',
     "colour": '#48c2c4',
     "args0": [],
     "toolbox": {
@@ -59,14 +60,13 @@ export class CreatorComponent implements OnInit {
   constructor(
     private creatorService: CreatorService,
     private message: NzMessageService,
-    private modal: NzModalService
+    private modal: NzModalService,
+    private loadService: LoadService
   ) { }
 
   ngOnInit(): void {
     let blockList = JSON.parse(localStorage.getItem('blockList'))
     if (blockList != null) this.blockList = blockList
-    // let sourceCode = JSON.parse(localStorage.getItem('sourceCode'))
-    // if (sourceCode != null) this.sourceCode = sourceCode
     let blockJson = JSON.parse(localStorage.getItem('blockJson'))
     if (blockJson != null) this.blockJson = blockJson
   }
@@ -87,6 +87,8 @@ export class CreatorComponent implements OnInit {
       }
     });
     this.initJsonEditor()
+
+    this.loadService.loaded.next(true);
   }
 
   initJsonEditor() {
@@ -167,7 +169,7 @@ export class CreatorComponent implements OnInit {
     if (this.blockJson.args0.length > 0) {
       for (let index = 1; index <= this.blockJson.args0.length; index++) {
         let argStr = '%' + index
-        console.log(argStr);
+        // console.log(argStr);
         if (!this.blockJson.message0.includes(argStr)) {
           this.errorTip.push(`not found "${argStr}" in message0`);
         }
@@ -230,6 +232,9 @@ export class CreatorComponent implements OnInit {
   selectedBlock;
   selectedBlockJson;
   selectBlock(block) {
+    //fix
+    if (typeof block.colour == 'number')
+      block.colour = '#666'
     this.mode = 'edit';
     this.selectedBlock = block
     this.blockJson = block
@@ -252,7 +257,9 @@ export class CreatorComponent implements OnInit {
         console.log(reader.result);
         try {
           let str = String(reader.result)
-          this.blockList = JSON.parse(str)
+          let blockList = JSON.parse(str)
+          // FIX
+          this.blockList = blockList
         } catch (error) {
           this.message.error('加载失败，库文件可能损坏')
         }
@@ -276,7 +283,7 @@ export class CreatorComponent implements OnInit {
     this.blockJson = {
       "inputsInline": true,
       "message0": '',
-      "type": '',
+      "type": 'new_block',
       "colour": '#48c2c4',
       "args0": [],
       "toolbox": {
@@ -292,7 +299,9 @@ export class CreatorComponent implements OnInit {
     if (this.mode == 'new')
       this.blockList.push(JSON.parse(JSON.stringify(this.blockJson)))
     else if (this.mode == 'edit') {
-      this.blockList[this.blockList.indexOf(this.selectedBlock)] = JSON.parse(JSON.stringify(this.blockJson))
+      let index = this.blockList.indexOf(this.selectedBlock)
+      this.blockList[index] = JSON.parse(JSON.stringify(this.blockJson))
+      this.selectBlock(this.blockList[index])
     }
     this.saveBlockList()
   }
@@ -337,5 +346,9 @@ export class CreatorComponent implements OnInit {
 
   gotoWebsite() {
     window.open("https://b4a.clz.me", "_blank")
+  }
+
+  about() {
+
   }
 }

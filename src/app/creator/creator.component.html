@@ -26,6 +26,10 @@
             nzTooltipPlacement="bottom">
             <i nz-icon nzType="global" nzTheme="outline"></i>
         </button>
+        <!-- <button nz-button nzSize="large" (click)="about()" nz-tooltip nzTooltipTitle="关于本软件"
+            nzTooltipPlacement="bottom">
+            <i class="fal fa-smile-wink"></i>
+        </button> -->
     </div>
 </header>
 <div class="creator-box">
@@ -114,19 +118,22 @@
                     </div>
                     <div class="item b-line" style="margin-bottom:5px;"></div>
                 </ng-container>
-                <div class="item">
-                    <div class="name">块显示</div>
-                    <div class="type">
-                        <label nz-checkbox [(ngModel)]="blockJson.toolbox.show"
-                            (ngModelChange)="blockJsonChange()">显示</label>
+                <ng-container *ngIf="blockJson.toolbox">
+                    <div class="item">
+                        <div class="name">块显示</div>
+                        <div class="type">
+                            <label nz-checkbox [(ngModel)]="blockJson.toolbox.show"
+                                (ngModelChange)="blockJsonChange()">显示</label>
+                        </div>
                     </div>
-                </div>
-                <div class="item">
-                    <div class="name">块分类</div>
-                    <div class="type">
-                        <input nz-input [(ngModel)]="blockJson.toolbox.category" (ngModelChange)="blockJsonChange()" />
+                    <div class="item">
+                        <div class="name">块分类</div>
+                        <div class="type">
+                            <input nz-input [(ngModel)]="blockJson.toolbox.category"
+                                (ngModelChange)="blockJsonChange()" />
+                        </div>
                     </div>
-                </div>
+                </ng-container>
             </div>
         </div>
 

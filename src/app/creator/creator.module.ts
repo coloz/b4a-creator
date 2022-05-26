@@ -16,6 +16,11 @@ import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzMessageModule } from 'ng-zorro-antd/message';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
+import { RouterModule, Routes } from '@angular/router';
+
+const routes: Routes = [
+  { path: '', component: CreatorComponent }
+];
 
 @NgModule({
   declarations: [
@@ -24,6 +29,7 @@ import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
   ],
   imports: [
     CommonModule,
+    RouterModule.forChild(routes),
     NzInputModule,
     NzButtonModule,
     FormsModule,
@@ -31,7 +37,7 @@ import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
     NzIconModule,
     MonacoEditorModule,
     NzRadioModule,
-    NgxColorsModule, 
+    NgxColorsModule,
     NzSelectModule,
     NzCheckboxModule,
     NzDividerModule,

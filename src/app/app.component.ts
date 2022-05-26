@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { LoadService } from './load.service';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,18 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'b4a-creator';
+
+  loaded = false;
+  showLoading = true;
+
+  constructor(
+    private loadService: LoadService
+  ) {
+    this.loadService.loaded.subscribe(state => {
+      this.loaded = state
+      setTimeout(() => {
+        this.showLoading = false
+      }, 1000);
+    })
+  }
 }

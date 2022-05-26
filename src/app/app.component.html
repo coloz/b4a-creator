@@ -1,1 +1,20 @@
-<app-creator></app-creator>
+<router-outlet></router-outlet>
+<!-- 加载遮罩层 -->
+<ng-container *ngIf="showLoading">
+    <div class="loading-box" [ngClass]="{'animate__animated animate__fadeOut': loaded}">
+      <div class="loader">
+        <div class="ball-grid-beat">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+      <div class="text">Loading...</div>
+    </div>
+  </ng-container>
