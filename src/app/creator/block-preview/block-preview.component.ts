@@ -39,6 +39,10 @@ export class BlockPreviewComponent implements OnInit {
         if (!this.workspace) {
           this.creatWorkspace()
         }
+        if (typeof changes['readOnly'] != 'undefined' && this.workspace) {
+          this.workspace.dispose()
+          this.creatWorkspace()
+        }
         if (typeof this.json != "undefined")
           if (typeof this.json.type != "undefined" && this.json.type != "")
             this.creatBlock(this.processJsonVariable(this.json))
@@ -47,8 +51,8 @@ export class BlockPreviewComponent implements OnInit {
           }
       }, 100);
     }
-
   }
+
 
   creatWorkspace() {
     let blockPreview = this.blockPreview.nativeElement;
@@ -101,7 +105,7 @@ export class BlockPreviewComponent implements OnInit {
           inputs: json.toolbox.inputs
         }
       // console.log(blockJson);
-      
+
       Blockly.serialization.blocks.append(blockJson, this.workspace)
       this.centerBlock()
     } catch (error) {

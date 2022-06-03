@@ -26,6 +26,7 @@ export class CreatorComponent implements OnInit {
   @ViewChild('jsoneditor', { read: ElementRef, static: true }) jsoneditorEl: ElementRef;
 
   jsonEditor;
+  hasInputValue = false;
 
   sourceCode = {
     macro: '',
@@ -165,10 +166,11 @@ export class CreatorComponent implements OnInit {
     this.jsonEditor.set(this.blockJson)
     this.blockJson_preview = JSON.parse(JSON.stringify(this.blockJson))
     localStorage.setItem('blockJson', JSON.stringify(this.blockJson))
+    this.checkHasInputValue()
   }
 
   checkJson() {
-    console.log(this.blockJson);
+    // console.log(this.blockJson);
 
     this.errorTip = [];
     if (this.blockJson.type == '') {
@@ -246,8 +248,22 @@ export class CreatorComponent implements OnInit {
           delete this.blockJson.toolbox.inputs[key]
       }
     }
+    this.checkHasInputValue()
+
     this.blockJson['args0'][index] = item
     this.blockJsonChange()
+  }
+
+  checkHasInputValue() {
+    let hasInputValue = false
+    for (let index = 0; index < this.blockJson['args0'].length; index++) {
+      const argItem = this.blockJson['args0'][index];
+      if (argItem.type == 'input_value') {
+        hasInputValue = true
+        break;
+      }
+    }
+    this.hasInputValue = hasInputValue
   }
 
   toolboxUpdate(e) {
@@ -319,6 +335,7 @@ export class CreatorComponent implements OnInit {
       }
     }
     this.selectedBlock = null
+    this.blockJsonChange()
   }
 
   saveBlock() {
