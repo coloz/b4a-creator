@@ -20,6 +20,7 @@ export interface BlockJson {
     "toolbox"?: {
         "show": boolean,
         "category"?: string
+        "inputs"?: any
     }
 }
 

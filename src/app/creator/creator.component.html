@@ -51,7 +51,8 @@
         <div class="top-box">
             <div class="preview-box">
                 <div class="title">块预览</div>
-                <app-block-preview [json]="blockJson_preview"></app-block-preview>
+                <app-block-preview [json]="blockJson_preview" [readOnly]="false"
+                    (toolboxUpdate)="toolboxUpdate($event)"></app-block-preview>
                 <div class="save-btn">
                     <button nz-button nzType="primary" nzShape="round" (click)="saveBlock()">保存块</button>
                 </div>

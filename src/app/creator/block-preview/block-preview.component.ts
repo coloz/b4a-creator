@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import Blockly from 'blockly';
 import { BlockJson } from '../interface';
 import { blockList } from './blocks';
@@ -15,10 +15,12 @@ export class BlockPreviewComponent implements OnInit {
   @Input() json: BlockJson;
   @Input() readOnly = true;
 
+  @Output() toolboxUpdate = new EventEmitter()
+
   @ViewChild('blockPreview', { read: ElementRef, static: true }) blockPreview: ElementRef
 
 
-  workspace;
+  workspace: Blockly.workspace;
   blockHeight = '60px'
 
   constructor(
@@ -68,13 +70,22 @@ export class BlockPreviewComponent implements OnInit {
       event instanceof Blockly.Events.BlockDelete ||
       event instanceof Blockly.Events.BlockChange
     ) {
-      // let block = this.workspace.getTopBlocks()[0];
-      // let code = block.getFieldValue('SSID')
-
-      // let childBlocks = block.childBlocks_
-      //   childBlocks.forEach(item => {
-      //     // let 
-      //   });
+      let block = this.workspace.getTopBlocks()[0]
+      let blockJson = Blockly.serialization.blocks.save(block, {
+        addCoordinates: true,
+        addInputBlocks: true,
+        addNextBlocks: false,
+        doFullSerialization: false
+      })
+      if (blockJson.inputs) {
+        for (const key in blockJson.inputs) {
+          delete blockJson.inputs[key].block.id
+        }
+        // console.log(blockJson);
+        this.toolboxUpdate.emit({ inputs: blockJson.inputs })
+      } else {
+        this.toolboxUpdate.emit({ inputs: null })
+      }
     }
   }
 
@@ -82,10 +93,19 @@ export class BlockPreviewComponent implements OnInit {
     try {
       this.workspace.clear();
       Blockly.defineBlocksWithJsonArray([json])
-      Blockly.serialization.blocks.append(json, this.workspace)
+      let blockJson = json
+      // console.log(json);
+      if (json.toolbox.inputs)
+        blockJson = {
+          type: json.type,
+          inputs: json.toolbox.inputs
+        }
+      // console.log(blockJson);
+      
+      Blockly.serialization.blocks.append(blockJson, this.workspace)
       this.centerBlock()
     } catch (error) {
-      console.log(error);
+      console.log(error.message);
     }
 
   }

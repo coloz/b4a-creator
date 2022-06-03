@@ -98,9 +98,15 @@ export class CreatorComponent implements OnInit {
       navigationBar: false,
       statusBar: false,
       onChange: () => {
-        this.blockJson = this.jsonEditor.get()
-        this.blockJson_preview = JSON.parse(JSON.stringify(this.blockJson))
-        localStorage.setItem('blockJson', JSON.stringify(this.blockJson))
+        try {
+          this.blockJson = this.jsonEditor.get()
+          this.checkJson()
+          this.blockJson_preview = JSON.parse(JSON.stringify(this.blockJson))
+          localStorage.setItem('blockJson', JSON.stringify(this.blockJson))
+        } catch (error) {
+
+        }
+
       }
     })
     this.blockJsonChange()
@@ -162,9 +168,15 @@ export class CreatorComponent implements OnInit {
   }
 
   checkJson() {
+    console.log(this.blockJson);
+
     this.errorTip = [];
     if (this.blockJson.type == '') {
       this.errorTip.push(`not found "type" or "type" is empty`);
+    }
+    let result = this.blockJson.message0.match(/\%\d/g)
+    if (result != null && result.length != this.blockJson.args0.length) {
+      this.errorTip.push(`the args in message0 and the args in args0 is not match`);
     }
     if (this.blockJson.args0.length > 0) {
       for (let index = 1; index <= this.blockJson.args0.length; index++) {
@@ -216,7 +228,8 @@ export class CreatorComponent implements OnInit {
       case 'field_image':
         item = {
           "type": "field_image",
-          "src": "",
+          "name": item.name,
+          "src": "https://diandeng.tech/favicon.ico",
           "width": 20,
           "height": 20,
           "alt": "*"
@@ -225,8 +238,22 @@ export class CreatorComponent implements OnInit {
       default:
         break;
     }
+    // check toolbox.inputs
+    // 当参数type不是input_value时，删除toolbox里的默认值
+    if (this.blockJson.toolbox.inputs) {
+      for (const key in this.blockJson.toolbox.inputs) {
+        if (key == item.name && item.type != 'input_value')
+          delete this.blockJson.toolbox.inputs[key]
+      }
+    }
     this.blockJson['args0'][index] = item
     this.blockJsonChange()
+  }
+
+  toolboxUpdate(e) {
+    this.blockJson.toolbox = Object.assign(this.blockJson.toolbox, e)
+    this.jsonEditor.set(this.blockJson)
+    localStorage.setItem('blockJson', JSON.stringify(this.blockJson))
   }
 
   selectedBlock;
