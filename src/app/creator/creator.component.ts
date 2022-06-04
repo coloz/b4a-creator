@@ -315,6 +315,11 @@ export class CreatorComponent implements OnInit {
           let blockList = JSON.parse(str)
           // FIX
           this.blockList = blockList
+          this.lib={
+            name: this.blockList[0].toolbox.category,
+            icon: this.blockList[0].toolbox.icon,
+            colour: this.blockList[0].toolbox.colour
+          }
         } catch (error) {
           this.message.error('加载失败，库文件可能损坏')
         }
@@ -325,6 +330,11 @@ export class CreatorComponent implements OnInit {
 
   newBlock() {
     this.mode = 'new'
+    this.lib = {
+      name: '分类名称',
+      icon: 'fal fa-cube',
+      colour: '#48c2c4'
+    }
     this.sourceCode = {
       macro: '',
       library: '',
