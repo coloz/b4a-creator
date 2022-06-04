@@ -14,6 +14,7 @@ export class BlockPreviewComponent implements OnInit {
 
   @Input() json: BlockJson;
   @Input() readOnly = true;
+  @Input() toCenter = true;
 
   @Output() toolboxUpdate = new EventEmitter()
 
@@ -69,11 +70,15 @@ export class BlockPreviewComponent implements OnInit {
     this.workspace.addChangeListener(event => this.onWorkspaceChange(event))
   }
 
+  noEmit = true;
   onWorkspaceChange(event) {
-    if (event instanceof Blockly.Events.BlockMove ||
-      event instanceof Blockly.Events.BlockDelete ||
-      event instanceof Blockly.Events.BlockChange
-    ) {
+    if (event instanceof Blockly.Events.BlockCreate) {
+      this.noEmit = true
+      setTimeout(() => {
+        this.noEmit = false
+      }, 100);
+    }
+    if (event instanceof Blockly.Events.BlockMove && !this.noEmit) {
       let block = this.workspace.getTopBlocks()[0]
       let blockJson = Blockly.serialization.blocks.save(block, {
         addCoordinates: true,
@@ -81,11 +86,10 @@ export class BlockPreviewComponent implements OnInit {
         addNextBlocks: false,
         doFullSerialization: false
       })
-      if (blockJson.inputs) {
+      if (blockJson.inputs && blockJson.inputs != null) {
         for (const key in blockJson.inputs) {
           delete blockJson.inputs[key].block.id
         }
-        // console.log(blockJson);
         this.toolboxUpdate.emit({ inputs: blockJson.inputs })
       } else {
         this.toolboxUpdate.emit({ inputs: null })
@@ -98,16 +102,13 @@ export class BlockPreviewComponent implements OnInit {
       this.workspace.clear();
       Blockly.defineBlocksWithJsonArray([json])
       let blockJson = json
-      // console.log(json);
       if (json.toolbox.inputs)
         blockJson = {
           type: json.type,
           inputs: json.toolbox.inputs
         }
-      // console.log(blockJson);
-
       Blockly.serialization.blocks.append(blockJson, this.workspace)
-      this.centerBlock()
+      if (this.toCenter) this.centerBlock()
     } catch (error) {
       console.log(error.message);
     }
@@ -126,8 +127,7 @@ export class BlockPreviewComponent implements OnInit {
       blockCoordinates.x;
     let y = workspaceMetrics.viewHeight / 2 - blockMetrics['height'] / 2 -
       blockCoordinates.y;
-    // Move block.
-    block.moveBy(x, y);
+    block.moveBy(x, y)
   };
 
   // 替换json配置中的board相关变量

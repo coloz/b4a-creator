@@ -33,19 +33,51 @@
     </div>
 </header>
 <div class="creator-box">
-    <div class="blockPreview-box animate__animated animate__fadeInLeft animate__faster"
-        [ngStyle]="{'width': isFold?'0':'350px'}">
-        <div class="title">块列表</div>
-        <div class="blockPreviewList" #blockPreviewList>
-            <div class="item" data-id="{{i}}" *ngFor="let block of blockList;index as i"
-                [ngClass]="{'selected': selectedBlock==block}" (click)="selectBlock(block)">
-                <app-block-preview [json]="block"></app-block-preview>
-                <div class="name">{{block.type}} <i (click)="delBlock(block)" nz-icon nzType="close"
-                        nzTheme="outline"></i></div>
-                <div class="mask"></div>
+
+    <div class="left-box animate__animated animate__fadeInLeft animate__faster">
+        <div class="lib-box">
+            <div class="title">块分类配置</div>
+            <div class="lib-preview">
+                <div class="kk" [ngStyle]="{'background':lib.colour}"></div>
+                <div class="icon"><i class="{{lib.icon}}"></i></div>
+                <div class="name">{{lib.name}}</div>
+            </div>
+            <div class="item">
+                <div class="name">分类名称</div>
+                <input nz-input [(ngModel)]="lib.name" (ngModelChange)="libChange()"/>
+            </div>
+            <div class="item">
+                <div class="name">图标</div>
+                <nz-input-group [nzSuffix]="suffixIconSearch">
+                    <input nz-input [(ngModel)]="lib.icon" (ngModelChange)="libChange()"/>
+                </nz-input-group>
+                <ng-template #suffixIconSearch>
+                    <i (click)="openUrl('https://fontawesome.com/v5/search')" style="font-size:20px;color:#999;cursor: pointer;" nz-icon nzType="question-circle"></i>
+                </ng-template>
+            </div>
+            <div class="item">
+                <div class="name">颜色</div>
+                <div>
+                    <ngx-colors ngx-colors-trigger [(ngModel)]="lib.colour" (ngModelChange)="libChange()">
+                    </ngx-colors>
+                </div>
+            </div>
+        </div>
+
+        <div class="blockPreview-box" [ngStyle]="{'width': isFold?'0':'350px'}">
+            <div class="title">块列表</div>
+            <div class="blockPreviewList" #blockPreviewList>
+                <div class="item" data-id="{{i}}" *ngFor="let block of blockList;index as i"
+                    [ngClass]="{'selected': selectedBlock==block}" (click)="selectBlock(block)">
+                    <app-block-preview [json]="block" [toCenter]="false"></app-block-preview>
+                    <div class="name">{{block.type}} <i (click)="delBlock(block)" nz-icon nzType="close"
+                            nzTheme="outline"></i></div>
+                    <div class="mask"></div>
+                </div>
             </div>
         </div>
     </div>
+
     <div class="right-box animate__animated animate__fadeInRight animate__faster"
         [ngStyle]="{'width': isFold?'100%':'calc(100% - 350px)'}">
         <div class="top-box">
@@ -62,7 +94,7 @@
                 </div>
             </div>
             <div class="itemList">
-                <div class="title">常用配置修改</div>
+                <div class="title">块常用配置</div>
                 <div class="item">
                     <div class="name">颜色</div>
                     <div>
@@ -121,19 +153,19 @@
                 </ng-container>
                 <ng-container *ngIf="blockJson.toolbox">
                     <div class="item">
-                        <div class="name">块显示</div>
+                        <div class="name">Toolbox显示</div>
                         <div class="type">
                             <label nz-checkbox [(ngModel)]="blockJson.toolbox.show"
                                 (ngModelChange)="blockJsonChange()">显示</label>
                         </div>
                     </div>
-                    <div class="item">
+                    <!-- <div class="item">
                         <div class="name">块分类</div>
                         <div class="type">
                             <input nz-input [(ngModel)]="blockJson.toolbox.category"
                                 (ngModelChange)="blockJsonChange()" />
                         </div>
-                    </div>
+                    </div> -->
                 </ng-container>
             </div>
         </div>
@@ -201,11 +233,6 @@
                 <div class="title">B4A配置</div>
                 <div style="height: calc(100% - 30px);">
                     <div #jsoneditor style="height:100%;width:100%;"></div>
-                    <!-- <textarea [(ngModel)]="blockJsonString" cols="30" rows="10"></textarea> -->
-                    <!-- <ngx-monaco-editor [options]="{language:'json',theme:'vs-dark',lineNumbers:'on'}"
-                        [(ngModel)]="blockJsonString" (ngModelChange)="blockJsonChange($event)"
-                        (init)="blockJsonEditorInit($event)">
-                    </ngx-monaco-editor> -->
                 </div>
             </div>
         </div>

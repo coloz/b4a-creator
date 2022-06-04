@@ -28,6 +28,12 @@ export class CreatorComponent implements OnInit {
   jsonEditor;
   hasInputValue = false;
 
+  lib = {
+    name: '分类名称',
+    icon: 'fal fa-cube',
+    colour: '#48c2c4'
+  }
+
   sourceCode = {
     macro: '',
     library: '',
@@ -40,7 +46,7 @@ export class CreatorComponent implements OnInit {
 
   jsonList = []
 
-  blockList = []
+  blockList: BlockJson[] = []
 
   code = ''
 
@@ -70,6 +76,8 @@ export class CreatorComponent implements OnInit {
     if (blockList != null) this.blockList = blockList
     let blockJson = JSON.parse(localStorage.getItem('blockJson'))
     if (blockJson != null) this.blockJson = blockJson
+    let lib = JSON.parse(localStorage.getItem('lib'))
+    if (lib != null) this.lib = lib
   }
 
   ngAfterViewInit(): void {
@@ -189,6 +197,10 @@ export class CreatorComponent implements OnInit {
         }
       }
     }
+  }
+
+  libChange() {
+    localStorage.setItem('lib', JSON.stringify(this.lib))
   }
 
   argTypeChange(item, index) {
@@ -364,8 +376,15 @@ export class CreatorComponent implements OnInit {
 
   download() {
     if (this.blockList.length == 0) this.message.error('您还未创建任何的块');
+    this.blockList.forEach((blockJson, index) => {
+      if (index == 0) {
+        blockJson.toolbox['icon'] = this.lib.icon
+        blockJson.toolbox['colour'] = this.lib.colour
+      }
+      blockJson.toolbox['category'] = this.lib.name
+    })
     try {
-      let file = new File([JSON.stringify(this.blockList)], `${this.blockList[0].toolbox.category}.json`, { type: "text/plain;charset=utf-8" });
+      let file = new File([JSON.stringify(this.blockList)], `${this.lib.name}.json`, { type: "text/plain;charset=utf-8" });
       saveAs(file);
     } catch (error) {
       this.message.error('导出失败')
@@ -390,6 +409,10 @@ export class CreatorComponent implements OnInit {
 
   gotoWebsite() {
     window.open("https://b4a.clz.me", "_blank")
+  }
+
+  openUrl(url) {
+    window.open(url, "_blank")
   }
 
   about() {
