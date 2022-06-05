@@ -26,29 +26,29 @@ export class CreatorComponent implements OnInit {
   @ViewChild('jsoneditor', { read: ElementRef, static: true }) jsoneditorEl: ElementRef;
 
   jsonEditor;
-  hasInputValue = false;
+  hasInputValue;
 
-  lib = {
-    name: '分类名称',
-    icon: 'fal fa-cube',
-    colour: '#48c2c4'
+  libInfo: {
+    category: string,
+    icon: string,
+    colour: string,
+    version: string,
+    source: string
   }
 
-  sourceCode = {
-    macro: '',
-    library: '',
-    variable: '',
-    object: '',
-    function: '',
-    setup: '',
-    code: ''
+  sourceCode: {
+    macro: string,
+    library: string,
+    variable: string,
+    object: string,
+    function: string,
+    setup: string,
+    code: string,
   }
 
-  jsonList = []
+  blockList: BlockJson[]
 
-  blockList: BlockJson[] = []
-
-  code = ''
+  code: string
 
   blockJson: BlockJson = {
     "inputsInline": true,
@@ -58,7 +58,7 @@ export class CreatorComponent implements OnInit {
     "args0": [],
     "toolbox": {
       "show": true,
-      "category": "unknown"
+      "inputs": null
     }
   };
 
@@ -72,12 +72,13 @@ export class CreatorComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.init()
     let blockList = JSON.parse(localStorage.getItem('blockList'))
     if (blockList != null) this.blockList = blockList
     let blockJson = JSON.parse(localStorage.getItem('blockJson'))
     if (blockJson != null) this.blockJson = blockJson
-    let lib = JSON.parse(localStorage.getItem('lib'))
-    if (lib != null) this.lib = lib
+    let libInfo = JSON.parse(localStorage.getItem('lib'))
+    if (libInfo != null) this.libInfo = libInfo
   }
 
   ngAfterViewInit(): void {
@@ -113,7 +114,7 @@ export class CreatorComponent implements OnInit {
           this.blockJson_preview = JSON.parse(JSON.stringify(this.blockJson))
           localStorage.setItem('blockJson', JSON.stringify(this.blockJson))
         } catch (error) {
-
+          console.error(error);
         }
 
       }
@@ -178,8 +179,6 @@ export class CreatorComponent implements OnInit {
   }
 
   checkJson() {
-    // console.log(this.blockJson);
-
     this.errorTip = [];
     if (this.blockJson.type == '') {
       this.errorTip.push(`not found "type" or "type" is empty`);
@@ -191,7 +190,6 @@ export class CreatorComponent implements OnInit {
     if (this.blockJson.args0.length > 0) {
       for (let index = 1; index <= this.blockJson.args0.length; index++) {
         let argStr = '%' + index
-        // console.log(argStr);
         if (!this.blockJson.message0.includes(argStr)) {
           this.errorTip.push(`not found "${argStr}" in message0`);
         }
@@ -200,7 +198,7 @@ export class CreatorComponent implements OnInit {
   }
 
   libChange() {
-    localStorage.setItem('lib', JSON.stringify(this.lib))
+    localStorage.setItem('lib', JSON.stringify(this.libInfo))
   }
 
   argTypeChange(item, index) {
@@ -275,7 +273,7 @@ export class CreatorComponent implements OnInit {
         break;
       }
     }
-    this.hasInputValue = hasInputValue
+      this.hasInputValue = hasInputValue
   }
 
   toolboxUpdate(e) {
@@ -312,13 +310,15 @@ export class CreatorComponent implements OnInit {
         console.log(reader.result);
         try {
           let str = String(reader.result)
-          let blockList = JSON.parse(str)
+          let libJson = JSON.parse(str)
           // FIX
-          this.blockList = blockList
-          this.lib={
-            name: this.blockList[0].toolbox.category,
-            icon: this.blockList[0].toolbox.icon,
-            colour: this.blockList[0].toolbox.colour
+          this.blockList = libJson.blocks
+          this.libInfo = {
+            category: libJson.category,
+            icon: libJson.icon,
+            colour: libJson.colour,
+            version: libJson.version,
+            source: libJson.source,
           }
         } catch (error) {
           this.message.error('加载失败，库文件可能损坏')
@@ -330,10 +330,12 @@ export class CreatorComponent implements OnInit {
 
   newBlock() {
     this.mode = 'new'
-    this.lib = {
-      name: '分类名称',
+    this.libInfo = {
+      category: '分类名称',
       icon: 'fal fa-cube',
-      colour: '#48c2c4'
+      colour: '#48c2c4',
+      version: '0.0.1',
+      source: ''
     }
     this.sourceCode = {
       macro: '',
@@ -353,7 +355,7 @@ export class CreatorComponent implements OnInit {
       "args0": [],
       "toolbox": {
         "show": true,
-        "category": "unknown"
+        "inputs": null
       }
     }
     this.selectedBlock = null
@@ -385,16 +387,13 @@ export class CreatorComponent implements OnInit {
   }
 
   download() {
-    if (this.blockList.length == 0) this.message.error('您还未创建任何的块');
-    this.blockList.forEach((blockJson, index) => {
-      if (index == 0) {
-        blockJson.toolbox['icon'] = this.lib.icon
-        blockJson.toolbox['colour'] = this.lib.colour
-      }
-      blockJson.toolbox['category'] = this.lib.name
-    })
+    if (this.blockList.length == 0) {
+      this.message.error('您还未创建任何的块');
+      return
+    }
+    let data = Object.assign(this.libInfo, { blocks: this.blockList })
     try {
-      let file = new File([JSON.stringify(this.blockList)], `${this.lib.name}.json`, { type: "text/plain;charset=utf-8" });
+      let file = new File([JSON.stringify(data)], `${this.libInfo.category}.json`, { type: "text/plain;charset=utf-8" });
       saveAs(file);
     } catch (error) {
       this.message.error('导出失败')
@@ -406,9 +405,9 @@ export class CreatorComponent implements OnInit {
       nzTitle: '清空',
       nzContent: '您确定要删除所有的块吗？',
       nzOnOk: () => {
-        this.blockList = []
-        this.newBlock();
+        this.init()
         this.saveBlockList()
+        this.libChange()
       }
     })
   }
@@ -428,4 +427,40 @@ export class CreatorComponent implements OnInit {
   about() {
 
   }
+
+  init() {
+    this.hasInputValue = false;
+    this.selectedBlock = null
+    this.libInfo = {
+      category: '分类名称',
+      icon: 'fal fa-cube',
+      colour: '#48c2c4',
+      version: '0.0.1',
+      source: ''
+    }
+
+    this.sourceCode = {
+      macro: '',
+      library: '',
+      variable: '',
+      object: '',
+      function: '',
+      setup: '',
+      code: ''
+    }
+    this.blockList = []
+    this.code = ''
+    this.blockJson = {
+      "inputsInline": true,
+      "message0": '',
+      "type": 'new_block',
+      "colour": '#48c2c4',
+      "args0": [],
+      "toolbox": {
+        "show": true,
+        "inputs": null
+      }
+    };
+  }
+
 }

@@ -38,27 +38,36 @@
         <div class="lib-box">
             <div class="title">块分类配置</div>
             <div class="lib-preview">
-                <div class="kk" [ngStyle]="{'background':lib.colour}"></div>
-                <div class="icon"><i class="{{lib.icon}}"></i></div>
-                <div class="name">{{lib.name}}</div>
+                <div class="kk" [ngStyle]="{'background':libInfo.colour}"></div>
+                <div class="icon"><i class="{{libInfo.icon}}"></i></div>
+                <div class="name">{{libInfo.category}}</div>
             </div>
             <div class="item">
                 <div class="name">分类名称</div>
-                <input nz-input [(ngModel)]="lib.name" (ngModelChange)="libChange()"/>
+                <input nz-input [(ngModel)]="libInfo.category" (ngModelChange)="libChange()" />
+            </div>
+            <div class="item">
+                <div class="name">版本号</div>
+                <input nz-input [(ngModel)]="libInfo.version" (ngModelChange)="libChange()" />
+            </div>
+            <div class="item">
+                <div class="name">源文件</div>
+                <input nz-input [(ngModel)]="libInfo.source" (ngModelChange)="libChange()" />
             </div>
             <div class="item">
                 <div class="name">图标</div>
                 <nz-input-group [nzSuffix]="suffixIconSearch">
-                    <input nz-input [(ngModel)]="lib.icon" (ngModelChange)="libChange()"/>
+                    <input nz-input [(ngModel)]="libInfo.icon" (ngModelChange)="libChange()" />
                 </nz-input-group>
                 <ng-template #suffixIconSearch>
-                    <i (click)="openUrl('https://fontawesome.com/v5/search')" style="font-size:20px;color:#999;cursor: pointer;" nz-icon nzType="question-circle"></i>
+                    <i (click)="openUrl('https://fontawesome.com/v5/search')"
+                        style="font-size:20px;color:#999;cursor: pointer;" nz-icon nzType="question-circle"></i>
                 </ng-template>
             </div>
-            <div class="item">
-                <div class="name">颜色</div>
+            <div class="item" style="position: absolute;top: 35px;left: 211px;">
+                <div class="name"></div>
                 <div>
-                    <ngx-colors ngx-colors-trigger [(ngModel)]="lib.colour" (ngModelChange)="libChange()">
+                    <ngx-colors ngx-colors-trigger [(ngModel)]="libInfo.colour" (ngModelChange)="libChange()">
                     </ngx-colors>
                 </div>
             </div>
