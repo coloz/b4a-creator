@@ -413,11 +413,11 @@ export class CreatorComponent implements OnInit {
   }
 
   gotoGithub() {
-    window.open("https://github.com/coloz/b4a-creator", "_blank")
+    window.open("https://github.com/ailyProject/aily-blockly", "_blank")
   }
 
   gotoWebsite() {
-    window.open("https://b4a.clz.me", "_blank")
+    window.open("https://aily.pro", "_blank")
   }
 
   openUrl(url) {
